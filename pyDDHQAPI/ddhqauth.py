@@ -1,6 +1,6 @@
-import requests
 import json
 
+import requests
 
 print("Authenticating...")
 with open('client_creds.json', 'r') as credentials:
