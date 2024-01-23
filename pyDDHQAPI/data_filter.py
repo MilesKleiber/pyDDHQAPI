@@ -27,7 +27,10 @@ def state_filter(setstate, state_dir):
                 cand_percent = float(cand_votes / total_votes) * 100
             pfile_name = f"{cand_name}_{setstate}_percent.txt"
             with open(state_dir + pfile_name, 'w') as file:
-                file.write(f"{cand_percent:.1f}")
+                if cand_percent == 100.0:
+                    file.write("100")
+                else:
+                    file.write(f"{cand_percent:.1f}")
 
         total_state_votes_in = s_response_data['data'][0]['topline_results']['total_votes']
         estimated_state_votes_high = s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_high']

@@ -1,11 +1,13 @@
 import os
 import platform
+import threading
+import time
 from datetime import datetime
 
 import data_filter
 import data_pull
+import guinterface
 import ddhqauth
-
 
 race_list = {
     "1/15": ["Iowa"],
@@ -30,54 +32,47 @@ race_list = {
 }
 
 
-def get_date():
-    current_date = datetime.now()
-    formatted_date = current_date.strftime("%-m/%d") if platform.system() != "Windows" else current_date.strftime(
-        "%#m/%d")
-    return formatted_date
-
-
 def manage_dirs():
-    filteredfp = 'CaucusData/'
-    if not os.path.exists(filteredfp):
-        os.makedirs(filteredfp)
-        print(f"Directory '{filteredfp}' created successfully.")
-    else:
-        print(f"Directory '{filteredfp}' already exists. Continuing.")
+    dirs = ['CaucusData/', 'CaucusData/National_delegates/']
+    for dir in dirs:
+        os.makedirs(dir, exist_ok=True)
+        print(f"Directory '{dir}' ensured to exist.")
+    return dirs[0], dirs[1]
 
-    national_deleg_dir = filteredfp + 'National_delegates/'
-    if not os.path.exists(national_deleg_dir):
-        os.makedirs(national_deleg_dir)
-        print(f"Directory '{national_deleg_dir}' created successfully.")
-    else:
-        print(f"Directory '{national_deleg_dir}' already exists. Continuing.")
 
-    return filteredfp, national_deleg_dir
+keep_running = True
+
+
+def run_logic(minutes, setdate):
+    global keep_running
+    data_interval = minutes * 60
+    while keep_running:
+        if setdate in race_list:
+            filteredfp, national_deleg_dir = manage_dirs()
+            delegate_time = data_pull.pull_data(None, categ='deleg')
+            for state in race_list[setdate]:
+                setstate = state
+                print("\nCurrent state set to: " + setstate)
+                state_dir = filteredfp + setstate + '/'
+                if not os.path.exists(state_dir):
+                    os.makedirs(state_dir)
+                    print(f"Directory '{state_dir}' created successfully.")
+                else:
+                    print(f"Directory '{state_dir}' already exists. Continuing.")
+
+                state_time = data_pull.pull_data(setstate, categ='state')
+                data_filter.state_filter(setstate, state_dir)
+                guinterface.state_data_time_label.config(text=f"State data last updated: {state_time}")
+                data_filter.delegate_filter(setstate, state_dir, national_deleg_dir)
+                guinterface.delegate_data_time_label.config(text=f"Delegate data last updated: {delegate_time}")
+                print(setstate + " done.\n")
+        else:
+            print("Race(s) not found for today.\n")
+        time.sleep(data_interval)
+        if not keep_running:
+            return
 
 
 if __name__ == '__main__':
-    formatted_date = get_date()
-    print("Current date set to: " + formatted_date)
-
-    # test date
-    formatted_date = '1/15'
-
-    if formatted_date in race_list:
-        data_pull.pull_data(None, categ='deleg')
-        filteredfp, national_deleg_dir = manage_dirs()
-        for state in race_list[formatted_date]:
-            setstate = state
-            print("\nCurrent state set to: " + setstate)
-            state_dir = filteredfp + setstate + '/'
-            if not os.path.exists(state_dir):
-                os.makedirs(state_dir)
-                print(f"Directory '{state_dir}' created successfully.")
-            else:
-                print(f"Directory '{state_dir}' already exists. Continuing.")
-
-            data_pull.pull_data(setstate, categ='state')
-            data_filter.state_filter(setstate, state_dir)
-            data_filter.delegate_filter(setstate, state_dir, national_deleg_dir)
-            print(setstate + " done.\n")
-    else:
-        print("Race(s) not found for today.\n")
+    minutes, setdate = guinterface.confirm_values()
+    threading.Thread(target=run_logic).start()  # Start the logic in a new thread

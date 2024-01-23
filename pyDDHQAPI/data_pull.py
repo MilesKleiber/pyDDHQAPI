@@ -33,3 +33,5 @@ def pull_data(setstate, categ):
             print(f"Delegate data was retrieved and written to delegate_response_data.json\n")
     else:
         print("GET request failed with status code:", response.status_code)
+
+    return time.strftime("%Y-%m-%d %H:%M:%S")
