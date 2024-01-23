@@ -7,11 +7,12 @@ long_description = (here / "README.md").read_text(encoding="utf-8")
 required = [
     "requests~=2.31.0",
     "setuptools~=69.0.3"
+    "sv_ttk~=2.5.5"
 ]
 
 setuptools.setup(
     name="pyDDHQAPI",
-    version="0.1.0",
+    version="0.2.1",
     author="Miles Kleiber",
     author_email="milesjkleiber@gmail.com",
     description="Request and Filter data with DecisionDeskHQ's v3 API",

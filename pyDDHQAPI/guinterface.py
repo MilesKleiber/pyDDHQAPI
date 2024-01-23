@@ -116,6 +116,8 @@ stop_button.grid(column=1, row=13, padx=0, pady=10)
 status_label = ttk.Label(root, text="Status: Stopped", font=10)
 status_label.grid(column=1, row=14, padx=0, pady=10)
 
+sv_ttk.set_theme("dark")
+
 root.mainloop()
 
-# sv_ttk.set_theme("dark")
+
