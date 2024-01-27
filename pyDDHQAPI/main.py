@@ -46,6 +46,7 @@ keep_running = True
 def run_logic(minutes, setdate):
     global keep_running
     data_interval = minutes * 60
+    previous_precincts_reporting_percent = 0.0
     while keep_running:
         if setdate in race_list:
             filteredfp, national_deleg_dir = manage_dirs()
@@ -62,9 +63,9 @@ def run_logic(minutes, setdate):
 
                 state_time = data_pull.pull_data(setstate, categ='state')
                 data_filter.state_filter(setstate, state_dir)
-                guinterface.state_data_time_label.config(text=f"State data last updated: {state_time}")
+                guinterface.state_data_time_label.config(text=state_time)
                 data_filter.delegate_filter(setstate, state_dir, national_deleg_dir)
-                guinterface.delegate_data_time_label.config(text=f"Delegate data last updated: {delegate_time}")
+                guinterface.delegate_data_time_label.config(text=delegate_time)
                 print(setstate + " done.\n")
         else:
             print("Race(s) not found for today.\n")

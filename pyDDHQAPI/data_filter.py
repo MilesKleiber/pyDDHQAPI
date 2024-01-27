@@ -1,7 +1,7 @@
 import json
 
 
-def state_filter(setstate, state_dir):
+def state_filter(setstate, state_dir, expected_turnout):
     with open(state_dir + f'{setstate}_response_data.json', 'r') as s_response_file:
         s_response_data = json.load(s_response_file)
 
@@ -33,14 +33,24 @@ def state_filter(setstate, state_dir):
                     file.write(f"{cand_percent:.1f}")
 
         total_state_votes_in = s_response_data['data'][0]['topline_results']['total_votes']
-        estimated_state_votes_high = s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_high']
+        if expected_turnout == 'Low':
+            estimated_state_votes = s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_low']
+        elif expected_turnout == 'Low-Medium':
+            estimated_state_votes = (s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_low'] + s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_mid']) / 2
+        elif expected_turnout == 'Medium':
+            estimated_state_votes = s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_mid']
+        elif expected_turnout == 'Medium-High':
+            estimated_state_votes = (s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_mid'] + s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_high']) / 2
+        else:  # 'High'
+            estimated_state_votes = s_response_data['data'][0]['topline_results']['estimated_votes']['estimated_votes_high']
+
         precincts_reportingpf = 'precincts_reporting_percent.txt'
         if total_state_votes_in <= 0.0:
             precincts_reporting_percent = 0.0
-        elif estimated_state_votes_high <= 0.0:
+        elif estimated_state_votes <= 0.0:
             precincts_reporting_percent = 0.0
         else:
-            precincts_reporting_percent = float(total_state_votes_in / estimated_state_votes_high) * 100
+            precincts_reporting_percent = float(total_state_votes_in / estimated_state_votes) * 100
         with open(state_dir + precincts_reportingpf, 'w') as prpfile:
             if precincts_reporting_percent == 100.0:
                 prpfile.write("100")

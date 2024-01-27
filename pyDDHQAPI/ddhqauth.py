@@ -16,7 +16,7 @@ response = requests.request("POST", authurl, headers=authheaders, data=authpaylo
 if response.status_code == 200:
     response_data = response.json()
     bearer_token_val = response_data['access_token']
-    with open('bearer_token.txt', 'w') as token_file:
+    with open('pyDDHQAPI/bearer_token.txt', 'w') as token_file:
         token_file.write(bearer_token_val)
     print("Authenticated. Token set to: " + str(bearer_token_val))
 else:
