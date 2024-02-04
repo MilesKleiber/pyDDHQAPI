@@ -7,7 +7,6 @@ from datetime import datetime
 import data_filter
 import data_pull
 import guinterface
-import ddhqauth
 
 race_list = {
     "1/15": ["Iowa"],
@@ -32,29 +31,27 @@ race_list = {
 }
 
 
-def manage_dirs():
-    dirs = ['CaucusData/', 'CaucusData/National_delegates/']
-    for dir in dirs:
-        os.makedirs(dir, exist_ok=True)
-        print(f"Directory '{dir}' ensured to exist.")
-    return dirs[0], dirs[1]
-
-
 keep_running = True
+pause_pushing = False
+previous_precincts_reporting_percent = {}
 
 
-def run_logic(minutes, setdate):
+def run_logic(minutes, setdate, expected_turnout, max_jump):
     global keep_running
+    global pause_pushing
+    global previous_precincts_reporting_percent
     data_interval = minutes * 60
-    previous_precincts_reporting_percent = 0.0
+
     while keep_running:
         if setdate in race_list:
-            filteredfp, national_deleg_dir = manage_dirs()
+            filteredfp = 'CaucusData/'
+            national_deleg_dir = 'CaucusData/National_delegates/'
             delegate_time = data_pull.pull_data(None, categ='deleg')
             for state in race_list[setdate]:
                 setstate = state
                 print("\nCurrent state set to: " + setstate)
                 state_dir = filteredfp + setstate + '/'
+
                 if not os.path.exists(state_dir):
                     os.makedirs(state_dir)
                     print(f"Directory '{state_dir}' created successfully.")
@@ -62,10 +59,17 @@ def run_logic(minutes, setdate):
                     print(f"Directory '{state_dir}' already exists. Continuing.")
 
                 state_time = data_pull.pull_data(setstate, categ='state')
-                data_filter.state_filter(setstate, state_dir)
-                guinterface.state_data_time_label.config(text=state_time)
+                current_precincts_reporting_percent, previous_precincts_reporting_percent, status_message = data_filter.state_filter(
+                    setstate, state_dir, expected_turnout, pause_pushing, previous_precincts_reporting_percent,
+                    max_jump)
+                guinterface.precincts_reporting_status_value_label.config(text=status_message)
+                if abs(current_precincts_reporting_percent - previous_precincts_reporting_percent[setstate]) > max_jump:
+                    guinterface.precincts_reporting_status_value_label.config(text="Jump Detected! Pausing data value "
+                                                                                   "output.")
+                    pause_pushing = True
                 data_filter.delegate_filter(setstate, state_dir, national_deleg_dir)
                 guinterface.delegate_data_time_label.config(text=delegate_time)
+                guinterface.state_data_time_label.config(text=state_time)
                 print(setstate + " done.\n")
         else:
             print("Race(s) not found for today.\n")
@@ -76,4 +80,4 @@ def run_logic(minutes, setdate):
 
 if __name__ == '__main__':
     minutes, setdate = guinterface.confirm_values()
-    threading.Thread(target=run_logic).start()  # Start the logic in a new thread
+    threading.Thread(target=run_logic).start()

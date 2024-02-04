@@ -1,7 +1,7 @@
 import json
 
 
-def state_filter(setstate, state_dir, expected_turnout):
+def state_filter(setstate, state_dir, expected_turnout, pause_pushing, previous_precincts_reporting_percent, max_jump):
     with open(state_dir + f'{setstate}_response_data.json', 'r') as s_response_file:
         s_response_data = json.load(s_response_file)
 
@@ -51,11 +51,25 @@ def state_filter(setstate, state_dir, expected_turnout):
             precincts_reporting_percent = 0.0
         else:
             precincts_reporting_percent = float(total_state_votes_in / estimated_state_votes) * 100
-        with open(state_dir + precincts_reportingpf, 'w') as prpfile:
-            if precincts_reporting_percent == 100.0:
-                prpfile.write("100")
-            else:
-                prpfile.write(f"{precincts_reporting_percent:.1f}")
+
+        previous_percent = previous_precincts_reporting_percent.get(setstate, 0.0)
+        status_message = "Normal"
+        jump = precincts_reporting_percent - previous_percent
+        if abs(jump) > max_jump:
+            status_message = "Jump Detected! Pausing data value output."
+            pause_pushing = True
+
+        previous_precincts_reporting_percent[setstate] = precincts_reporting_percent
+
+        if not pause_pushing:
+            with open(state_dir + precincts_reportingpf, 'w') as prpfile:
+                if precincts_reporting_percent == 100.0:
+                    prpfile.write("100")
+                else:
+                    prpfile.write(f"{precincts_reporting_percent:.1f}")
+        elif pause_pushing:
+            print("Pushing paused.")
+        return precincts_reporting_percent, previous_precincts_reporting_percent, status_message
 
 
 def delegate_filter(setstate, state_dir, national_deleg_dir):
