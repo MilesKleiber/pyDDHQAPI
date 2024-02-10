@@ -1,8 +1,6 @@
 import tkinter as tk
 from tkinter import *
 from tkinter import ttk
-from tkinter.ttk import *
-import sv_ttk
 import threading
 import main
 import json
@@ -60,10 +58,6 @@ def set_expected_turnout(frame, options):
     return expected_turnout
 
 
-def update_label(value):
-    slider_label.config(text=f"Data interval: {int(float(value))} minutes")
-
-
 def confirm_values():
     global minutes
     global setdate
@@ -71,9 +65,6 @@ def confirm_values():
     minutes = int(minutes_spinbox.get())
     setdate = str(selected_date.get())
     max_jump = int(max_jump_spinbox.get())
-    print(f"Confirmed data request interval: {minutes} minutes")
-    print(f"Confirmed date: {setdate}")
-    print(f"Confirmed max precincts reporting jump: {max_jump}%")
     start_main_logic()
     return minutes, setdate, max_jump
 
@@ -81,6 +72,7 @@ def confirm_values():
 def continue_pushing():
     main.pause_pushing = False
     precincts_reporting_status_value_label.config(text="Normal")
+    print("Pushing resumed.")
 
 
 def update_client_creds():
@@ -114,27 +106,8 @@ def update_bearer_token_text():
     bearer_token_text.config(state='disabled')
 
 
-races = {
-    "1/15": ["Iowa"],
-    "1/23": ["New Hampshire"],
-    "2/06": ["Nevada"],
-    "2/08": ["Virgin Islands"],
-    "2/24": ["South Carolina"],
-    "2/27": ["Michigan"],
-    "3/02": ["Idaho", "Missouri"],
-    "3/04": ["North Dakota"],
-    "3/05": ["Alabama", "Arkansas", "California", "Colorado", "Maine", "Massachusetts", "Minnesota", "North Carolina",
-             "Oklahoma", "Tennessee", "Texas", "Utah", "Vermont", "Virginia"],
-    "3/12": ["Georgia", "Hawaii", "Mississippi", "Washington"],
-    "3/19": ["Arizona", "Florida", "Illinois", "Kansas", "Ohio"],
-    "3/23": ["Louisiana"],
-    "4/02": ["Connecticut", "Delaware", "New York", "Rhode Island", "Wisconsin"],
-    "4/23": ["Pennsylvania"],
-    "5/07": ["Indiana"],
-    "5/14": ["Maryland", "Nebraska", "West Virginia"],
-    "5/21": ["Kentucky", "Oregon"],
-    "6/04": ["D.C.", "Montana", "New Jersey", "New Mexico", "South Dakota"]
-}
+with open('pyDDHQAPI/primary_races.json', 'r') as racefile:
+    races = json.load(racefile)
 
 dates = list(races.keys())
 
@@ -189,12 +162,14 @@ state_data_time_label.grid(column=1, row=1, padx=0, pady=0)
 ttk.Label(status_frame, text="Delegate data last updated:", font=10).grid(column=1, row=2, padx=0, pady=0)
 delegate_data_time_label = ttk.Label(status_frame, text="", font=10)
 delegate_data_time_label.grid(column=1, row=3, padx=0, pady=0)
-precincts_reporting_status_label = ttk.Label(status_frame, text="Precincts Reporting Status: ", font=("Calibri", 12))
+precincts_reporting_status_label = ttk.Label(status_frame, text="Precincts Reporting Change: ", font=("Calibri", 12))
 precincts_reporting_status_label.grid(column=1, row=4, padx=0, pady=0)
+precincts_reporting_calculation_values_label = ttk.Label(status_frame, text="", font=("Calibri", 12))
+precincts_reporting_calculation_values_label.grid(column=1, row=5, padx=0, pady=0)
 precincts_reporting_status_value_label = ttk.Label(status_frame, text="Normal", font=("Calibri", 12))
-precincts_reporting_status_value_label.grid(column=1, row=5, padx=0, pady=0)
+precincts_reporting_status_value_label.grid(column=1, row=6, padx=0, pady=0)
 resume_button = ttk.Button(status_frame, text="Override", command=continue_pushing)
-resume_button.grid(column=1, row=6, padx=0, pady=10, columnspan=2)
+resume_button.grid(column=1, row=7, padx=0, pady=10, columnspan=2)
 
 process_frame = (ttk.Frame(root, borderwidth=2, relief="groove", padding=5, width=700, height=200))
 process_frame.grid(column=0, row=4, padx=0, pady=0)
@@ -206,7 +181,5 @@ status_label = ttk.Label(process_frame, text="Status: Stopped", font=10)
 status_label.grid(column=0, row=1, padx=0, pady=0, columnspan=2)
 style.configure("Green.TButton", foreground="green")
 style.configure("Red.TButton", foreground="red")
-
-#sv_ttk.set_theme("dark")
 
 root.mainloop()

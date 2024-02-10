@@ -1,0 +1,21 @@
+{
+    "1/15": ["Iowa"],
+    "1/23": ["New Hampshire"],
+    "2/06": ["Nevada"],
+    "2/08": ["Virgin Islands"],
+    "2/24": ["South Carolina"],
+    "2/27": ["Michigan"],
+    "3/02": ["Idaho", "Missouri"],
+    "3/04": ["North Dakota"],
+    "3/05": ["Alabama", "Arkansas", "California", "Colorado", "Maine", "Massachusetts", "Minnesota", "North Carolina",
+             "Oklahoma", "Tennessee", "Texas", "Utah", "Vermont", "Virginia"],
+    "3/12": ["Georgia", "Hawaii", "Mississippi", "Washington"],
+    "3/19": ["Arizona", "Florida", "Illinois", "Kansas", "Ohio"],
+    "3/23": ["Louisiana"],
+    "4/02": ["Connecticut", "Delaware", "New York", "Rhode Island", "Wisconsin"],
+    "4/23": ["Pennsylvania"],
+    "5/07": ["Indiana"],
+    "5/14": ["Maryland", "Nebraska", "West Virginia"],
+    "5/21": ["Kentucky", "Oregon"],
+    "6/04": ["D.C.", "Montana", "New Jersey", "New Mexico", "South Dakota"]
+}

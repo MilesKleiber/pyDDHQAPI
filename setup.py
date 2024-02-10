@@ -12,7 +12,7 @@ required = [
 
 setuptools.setup(
     name="pyDDHQAPI",
-    version="0.3.0",
+    version="0.3.2",
     author="Miles Kleiber",
     author_email="milesjkleiber@gmail.com",
     description="Request and Filter data with DecisionDeskHQ's v3 API",

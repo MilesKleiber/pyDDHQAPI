@@ -6,10 +6,8 @@ def state_filter(setstate, state_dir, expected_turnout, pause_pushing, previous_
         s_response_data = json.load(s_response_file)
 
     if s_response_data['total'] == 0:
-        print(f"No {setstate} state data was available from the DecisionDeskHQ API.")
         return
     else:
-        print(f"State data was present and written to {setstate}_response_data.json")
         cand_list = s_response_data['data'][0]['candidates']
         for candidates in cand_list:
             cand_name = candidates['last_name']
@@ -87,7 +85,7 @@ def delegate_filter(setstate, state_dir, national_deleg_dir):
                     state_delegate_vote_total = state_data['total']
                     break
                 else:
-                    print(f"State ({setstate}) does not exist in delegate data.")
+                    print(f"State ({setstate}) does not exist in delegate data. Continuing...")
                     return
     state_delegate_republican_ids = list(state_delegate_republican_data.keys())
     national_delegate_republican_ids = list(national_delegate_republican_data.keys())

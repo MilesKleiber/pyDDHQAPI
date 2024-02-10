@@ -13,11 +13,9 @@ def pull_data(setstate, categ):
     }
 
     if categ == "state":
-        print(f"Pulling {setstate} data at: " + time.strftime("%Y-%m-%d %H:%M:%S"))
         url = (f'https://resultsapi.decisiondeskhq.com/api/v3/races?limit=1&page=1&year=2024'
                      f'&state_name={setstate}&party_id=2')
     elif categ == "deleg":
-        print("\nPulling delegate data at: " + time.strftime("%Y-%m-%d %H:%M:%S"))
         url = 'https://resultsapi.decisiondeskhq.com/api/v3/delegates/2024'
 
     response = requests.request("GET", url, headers=headers)
@@ -30,7 +28,6 @@ def pull_data(setstate, categ):
             d_response_data = response.json()
             with open(f'CaucusData/delegate_response_data.json', 'w') as d_response_file:
                 json.dump(d_response_data, d_response_file, indent=4)
-            print(f"Delegate data was retrieved and written to delegate_response_data.json\n")
     else:
         print("GET request failed with status code:", response.status_code)
 

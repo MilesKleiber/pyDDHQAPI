@@ -14,6 +14,12 @@ NOTE: Still a work in progress.
 
 *WIP
 
+## To-Do/Known Issues to be fixed:
+- **Test Data**
+- **Example Documents**
+
+- Bug issue in reading and displaying new token after already acquiring one previously.
+
 
 ## License
 
